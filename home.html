@@ -1,0 +1,92 @@
+<!DOCTYPE HTML>
+<htmi scroll-behavior: smooth>
+<head>
+<title>Roll</title>
+<style>
+body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:10vw;} 
+h1, h2, h3{margin:0;padding:0;font-weight:normal;}
+h1{font-size:12vw;font-weight:bold;}
+h2{font-size:10vw;font-weight:bold;}
+h3{font-size:2vw;text-align:center;colspan=1;rowspan=1}
+table {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+    width: 100%;
+}
+table thead {
+    /* head takes the height it requires, 
+    and it's not scaled when table is resized */
+    flex: 0 0 auto;
+    width: calc(100% - 0.9em);
+}
+table tbody {
+    /* body takes all the remaining available space */
+    flex: 1 1 auto;
+    display: block;
+    overflow-y: scroll;
+}
+table tbody tr {
+    width: 100%;
+}
+table thead, table tbody tr {
+    display: table;
+    table-layout: fixed;
+}
+.day{background:#A8F9FC;color:#022587;}
+.night{background:#022587;color:#A8F9FC;}
+</style>
+</head>
+<body>
+<div id="textDiv"></div>
+<div id="rowDiv">
+    <div id="tableDiv">
+	    <table id="tableId" style="width: 100%;">
+		    <tr>
+			    <td><div id="c1Div"></div></td>
+			    <td><div id="c2Div"></div></td>
+			    <td><div id="c3Div"></div></td>
+		    </tr>
+	    </table>
+</div>
+<script type="text/javascript">
+formatCell = function(name, birthYear, deathYear)
+{
+	var returnString = "<h3>" + name + " (" + birthYear + " - " + deathYear + ")</h3>";
+ 
+    return returnString;
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+window.onload = async function start() {
+    var maxRows = 10;
+    var name = "Bob Smith";
+    var birthYear = "1920";
+    var deathYear = "2016";
+    for (i=0; i<50; i++) {
+        rowIndex = addPerson(name + i, birthYear, deathYear);
+	if (rowIndex > maxRows) document.getElementById("tableId").deleteRow(rowIndex - maxRows); 
+	
+	await new Promise(r => setTimeout(r, 2000));    
+    }
+	
+}
+
+function addPerson(name, birthYear, deathYear) {
+    var row = document.getElementById("tableId").insertRow();
+    var c1 = row.insertCell(0);
+    var c2 = row.insertCell(1);
+    var c3 = row.insertCell(2);
+    c1.innerHTML = formatCell(name, birthYear, deathYear);
+    c2.innerHTML = formatCell(name, birthYear, deathYear);
+    c3.innerHTML = formatCell(name, birthYear, deathYear);
+    return row.rowIndex;
+
+}
+
+</script>
+</body>
+</html>
