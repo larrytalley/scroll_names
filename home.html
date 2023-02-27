@@ -63,9 +63,10 @@ function sleep(ms) {
 
 window.onload = async function start() {
     var maxRows = 10;
+    
+    const nameDataLines = await readInputData();
+    console.log(nameDataLines);
 
-    await new Promise(r => readInputData());
-	    
     var name = "Bob Smith";
     var birthYear = "1920";
     var deathYear = "2016";
@@ -93,7 +94,8 @@ async function readInputData() {
     const response = await 
       fetch('https://docs.google.com/document/d/10PkqSZ3iPuy6vIPcjINc5u72oD9iKc_YG8mwaTPxhUA/export?format=txt');
     const nameData = await response.text();
-    return nameData;
+	const nameDataLines = nameData.split(/\r?\n/).map(x => x.split(/,/));
+    return nameDataLines;
 }
 
 </script>
