@@ -95,7 +95,11 @@ async function readInputData() {
       fetch('https://docs.google.com/document/d/10PkqSZ3iPuy6vIPcjINc5u72oD9iKc_YG8mwaTPxhUA/export?format=txt');
     const nameData = await response.text();
     const nameDataLines = nameData.split(/\r?\n/);
-	return nameDataLines.map((element) => element.split(/,/));
+	return nameDataLines.map((line) => 
+		line.split(/,/)).map((lineArray) => 
+			`name: ${lineArray[0]}, 
+			 birthYear: ${lineArray[1]}, 
+			 deathYear: ${lineArray[2]}`)
 }
 
 </script>
