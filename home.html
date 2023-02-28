@@ -65,6 +65,8 @@ window.onload = async function start() {
     var maxRows = 10;
     
     const nameDataLines = await readInputData();
+    //console.log(nameDataLines);
+    nameDataLines.sort((a,b) => a[2] - b[2]);
     console.log(nameDataLines);
 
     var name = "Bob Smith";
@@ -95,11 +97,13 @@ async function readInputData() {
       fetch('https://docs.google.com/document/d/10PkqSZ3iPuy6vIPcjINc5u72oD9iKc_YG8mwaTPxhUA/export?format=txt');
     const nameData = await response.text();
     const nameDataLines = nameData.split(/\r?\n/);
-	return nameDataLines.map((line) => 
-		line.split(/,/)).map((lineArray) => 
-			`name: ${lineArray[0]}, 
-			 birthYear: ${lineArray[1]}, 
-			 deathYear: ${lineArray[2]}`)
+
+    return nameDataLines.map((line) => 
+		line.split(/,/));
+	//.map((lineArray) => 
+	//		`name: ${lineArray[0]}, 
+	//		 birthYear: ${lineArray[1]}, 
+	//		 deathYear: ${lineArray[2]}`)
 }
 
 </script>
