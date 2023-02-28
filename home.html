@@ -7,7 +7,7 @@ body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:10vw;}
 h1, h2, h3{margin:0;padding:0;font-weight:normal;}
 h1{font-size:12vw;font-weight:bold;}
 h2{font-size:10vw;font-weight:bold;}
-h3{font-size:2.25vw;text-align:center;colspan=1;rowspan=1}
+h3{font-size:2vw;text-align:center;colspan=1;rowspan=1}
 table {
     display: flex;
     flex-flow: column;
@@ -57,53 +57,140 @@ formatCell = function(name, birthYear, deathYear)
     return returnString;
 }
 
+formatEmptyCell = function()
+{
+	var returnString = "<h3></h3>";
+ 
+    return returnString;
+}
+
+formatDecadeHeaderCell = function(decade)
+{
+	var returnString = "<h3>" + decade + "</h3>";
+ 
+    return returnString;
+}
+
+
+
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/*
+function sleep(milliseconds) {
+    var start = new Date().getTime();
+    for (var i = 0; i < 1e7; i++) {
+        if ((new Date().getTime() - start) > milliseconds){
+            break;
+        }
+    }
+}
+*/
+
 // global variables to track rows and columns
 var currentRowNumber = 0;
 var currentRowId;
+var currentColumnArray = new Array;
 var currentColumnNumber = 0;
 var currentColumnId;
 var screenWidthColumns = 3;
+var screenLengthRows = 25;
+var pauseMilliseconds;
 
 window.onload = async function start() {
     var screenLengthRows = 25;
     
     const nameDataLines = await readInputData();
     const numberOfNames = nameDataLines.length;
-    console.log(numberOfNames);
-    const pauseMilliseconds = 225000 / (numberOfNames / 3);
-    console.log(pauseMilliseconds);
+//    console.log(numberOfNames);
+    pauseMilliseconds = 225000 / (numberOfNames / 3);
+//    console.log(pauseMilliseconds);
     nameDataLines.sort((a,b) => a[2] - b[2]);
-    console.log(nameDataLines);
+//    console.log(nameDataLines);
     const firstDecadeYear = Math.floor(nameDataLines[0][2]/10) * 10;
     const lastDecadeYear = Math.floor(nameDataLines[numberOfNames - 1][2]/10) * 10;
-    console.log(firstDecadeYear);
-    console.log(lastDecadeYear);
+//    console.log(firstDecadeYear);
+//    console.log(lastDecadeYear);
 
-    var name = "Bob Smith";
-    var birthYear = "1920";
-    var deathYear = "2016";
-    for (i=0; i<50; i++) {
-        rowIndex = addPerson(name + i, birthYear, deathYear);
-	if (rowIndex > screenLengthRows) document.getElementById("tableId").deleteRow(rowIndex - screenLengthRows); 
-	
-	await new Promise(r => setTimeout(r, pauseMilliseconds));    
+    addBlankLinesFast(screenLengthRows);
+    // process decades
+    for (decade=firstDecadeYear; decade<=lastDecadeYear; decade+=10) {
+//	console.log(decade);
+	addDecadeHeader(decade);
+	    await new Promise(r => setTimeout(r, pauseMilliseconds)); 
+	nameDataLines
+	    .filter(data => ((data[2] >= decade) && (data[2] < (decade + 10))))
+		    .forEach(data => addPerson(data[0], data[1], data[2]));
     }
+    addBlankLinesSlow(25);
+}
+
+function addBlankLinesFast(numberOfLines) {
+    for (line=0; line<numberOfLines; line++) {
+	addBlankLine();
+    }
+    return currentRowId;
+}
+
+function addBlankLinesSlow(numberOfLines) {
+    for (line=0; line<numberOfLines; line++) {
+	addBlankLineSlow();
+    }
+    return currentRowId;
+}
+
+function addBlankLineSlow() {
+    addBlankLine();
+    //await new Promise(r => setTimeout(r, pauseMilliseconds)); 
+    sleep(pauseMilliseconds);
+    console.log(pauseMilliseconds);
+    return currentRowId;
+}
+
+function addBlankLine() {
+    currentRowId = document.getElementById("tableId").insertRow();
+    currentRowNumber++;
+    for (currentColumnNumber=0; currentColumnNumber<screenWidthColumns; currentColumnNumber++) {
+        currentColumnArray[currentColumnNumber] = currentRowId.insertCell(currentColumnNumber);
+    }
+    currentColumnArray[0].innerHTML = formatEmptyCell();
+    currentColumnArray[1].innerHTML = formatEmptyCell();
+    currentColumnArray[2].innerHTML = formatEmptyCell();
+
+    currentColumnNumber = 0;
+
+    if (currentRowNumber > screenLengthRows) deleteTopRow();
+    
+    return currentRowId;
+}
+
+function deleteTopRow() {
+    //document.getElementById("tableId").deleteRow(0);
+    return;
+}
+
+function addDecadeHeader(decade) {
+    addBlankLinesSlow(1);
+    addBlankLinesSlow(1);
+
+    currentColumnArray[0].innerHTML = formatEmptyCell();
+    currentColumnArray[1].innerHTML = formatDecadeHeaderCell(decade);
+    currentColumnArray[2].innerHTML = formatEmptyCell();
 	
+    addBlankLinesSlow(1);
+    return currentRowId;
+
 }
 
 function addPerson(name, birthYear, deathYear) {
-    var row = document.getElementById("tableId").insertRow();
-    var c1 = row.insertCell(0);
-    var c2 = row.insertCell(1);
-    var c3 = row.insertCell(2);
-    c1.innerHTML = formatCell(name, birthYear, deathYear);
-    c2.innerHTML = formatCell(name, birthYear, deathYear);
-    c3.innerHTML = formatCell(name, birthYear, deathYear);
-    return row.rowIndex;
+    if (currentColumnNumber >= screenWidthColumns) {
+        addBlankLine();
+    }
+//    console.log(currentColumnNumber);
+    currentColumnArray[currentColumnNumber].innerHTML = formatCell(name, birthYear, deathYear);
+    currentColumnNumber++;
+    return currentRowId;
 }
 
 async function readInputData() {
