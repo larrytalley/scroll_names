@@ -87,7 +87,8 @@ window.onload = async function start() {
     
     const nameDataLines = await readInputData();
     const numberOfNames = nameDataLines.length;
-    console.log("starting at " + new Date().toLocaleString());
+    const startTime = new Date();
+    console.log("Starting at " + startTime.toLocaleString() + ".");
     console.log(numberOfNames);
     pauseMilliseconds = 225000 / numberOfNames;
     console.log(pauseMilliseconds);
@@ -117,7 +118,10 @@ window.onload = async function start() {
         addBlankLine();
         await new Promise(r => setTimeout(r, pauseMilliseconds));
     }
-    console.log("Ending at " + new Date().toLocaleString());   
+    const endTime = new Date();
+    const elapsedTimeMilliseconds = endTime - startTime;
+    console.log("Ending at " + endTime.toLocaleString() + ".");
+    console.log("Elapsed time " + elapsedTimeMilliseconds + ".");
 	
 }
 
