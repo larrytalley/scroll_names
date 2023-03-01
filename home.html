@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<htmi scroll-behavior: smooth>
+<html scroll-behavior: smooth>
 <head>
 <title>Roll</title>
 <style>
@@ -90,7 +90,7 @@ window.onload = async function start() {
     const startTime = new Date();
     console.log("Starting at " + startTime.toLocaleString() + ".");
     console.log(numberOfNames);
-    pauseMilliseconds = 225000 / numberOfNames;
+    pauseMilliseconds = 225000 / (numberOfNames + screenLengthRows);
     console.log(pauseMilliseconds);
     nameDataLines.sort((a,b) => a[2] - b[2]);
     const firstDecadeYear = Math.floor(nameDataLines[0][2]/10) * 10;
@@ -139,10 +139,8 @@ function addBlankLine() {
     currentRowNumber++;
     for (currentColumnNumber=0; currentColumnNumber<screenWidthColumns; currentColumnNumber++) {
         currentColumnArray[currentColumnNumber] = currentRowId.insertCell(currentColumnNumber);
+        currentColumnArray[currentColumnNumber] = formatEmptyCell();
     }
-    currentColumnArray[0].innerHTML = formatEmptyCell();
-    currentColumnArray[1].innerHTML = formatEmptyCell();
-    currentColumnArray[2].innerHTML = formatEmptyCell();
 
     currentColumnNumber = 0;
 
@@ -160,11 +158,12 @@ function addDecadeHeader(decade) {
     addBlankLine();
     addBlankLine();
     addBlankLine();
+    for (currentColumnNumber=0; currentColumnNumber<screenWidthColumns; currentColumnNumber++) {
+        currentColumnArray[currentColumnNumber] = formatEmptyCell();
+    }
+    currentColumnArray[Math.floor(screenWidthColumns / 2)].innerHTML = formatDecadeHeaderCell(decade);
+    console.log(Math.floor(screenWidthColumns / 2));
 
-    currentColumnArray[0].innerHTML = formatEmptyCell();
-    currentColumnArray[1].innerHTML = formatDecadeHeaderCell(decade);
-    currentColumnArray[2].innerHTML = formatEmptyCell();
-	
     addBlankLine();
     addBlankLine();
 	
@@ -176,7 +175,7 @@ function addPerson(name, birthYear, deathYear) {
     if (currentColumnNumber >= screenWidthColumns) {
         addBlankLine();
     }
-//    console.log(currentColumnNumber);
+    console.log(currentColumnNumber);
     currentColumnArray[currentColumnNumber].innerHTML = formatCell(name, birthYear, deathYear);
     currentColumnNumber++;
     return currentRowId;
@@ -184,7 +183,17 @@ function addPerson(name, birthYear, deathYear) {
 
 async function readInputData() {
     const response = await 
-      fetch('https://docs.google.com/document/d/10PkqSZ3iPuy6vIPcjINc5u72oD9iKc_YG8mwaTPxhUA/export?format=txt');
+    fetch('https://docs.google.com/document/d/10PkqSZ3iPuy6vIPcjINc5u72oD9iKc_YG8mwaTPxhUA/export?format=txt',
+        {
+        mode: "cors", // no-cors, *cors, same-origin
+        cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: "omit", // include, *same-origin, omit
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        redirect: "follow", // manual, *follow, error
+        referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url);
     const nameData = await response.text();
     const nameDataLines = nameData.split(/\r?\n/);
 
