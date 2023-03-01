@@ -105,7 +105,7 @@ window.onload = async function start() {
     const nameDataLines = await readInputData();
     const numberOfNames = nameDataLines.length;
 //    console.log(numberOfNames);
-    pauseMilliseconds = 225000 / (numberOfNames / 3);
+    pauseMilliseconds = 225000 / numberOfNames;
 //    console.log(pauseMilliseconds);
     nameDataLines.sort((a,b) => a[2] - b[2]);
 //    console.log(nameDataLines);
