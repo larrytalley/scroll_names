@@ -22,12 +22,17 @@ table thead {
 }
 table tbody {
     /* body takes all the remaining available space */
-    flex: 1 1 auto;
+   // flex: 1 1 auto;
     display: block;
-    overflow-y: scroll;
+   // overflow-y: scroll;
 }
 table tbody tr {
     width: 100%;
+    display:block;
+    height:2vw;
+    min-height:2vw;
+    max-height:2vw;
+    overflow:hidden;
 }
 table thead, table tbody tr {
     display: table;
@@ -43,9 +48,6 @@ table thead, table tbody tr {
     <div id="tableDiv">
 	    <table id="tableId" style="width: 100%;">
 		    <tr>
-			    <td><div id="c1Div"></div></td>
-			    <td><div id="c2Div"></div></td>
-			    <td><div id="c3Div"></div></td>
 		    </tr>
 	    </table>
 </div>
@@ -71,11 +73,11 @@ formatDecadeHeaderCell = function(decade)
     return returnString;
 }
 
-
-
+/*
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+*/
 
 /*
 function sleep(milliseconds) {
@@ -95,11 +97,10 @@ var currentColumnArray = new Array;
 var currentColumnNumber = 0;
 var currentColumnId;
 var screenWidthColumns = 3;
-var screenLengthRows = 25;
+var screenLengthRows = 20;
 var pauseMilliseconds;
 
 window.onload = async function start() {
-    var screenLengthRows = 25;
     
     const nameDataLines = await readInputData();
     const numberOfNames = nameDataLines.length;
@@ -113,7 +114,8 @@ window.onload = async function start() {
 //    console.log(firstDecadeYear);
 //    console.log(lastDecadeYear);
 
-    addBlankLinesFast(screenLengthRows);
+    addBlankLines(screenLengthRows);
+/*
     // process decades
     for (decade=firstDecadeYear; decade<=lastDecadeYear; decade+=10) {
 //	console.log(decade);
@@ -123,28 +125,33 @@ window.onload = async function start() {
 	    .filter(data => ((data[2] >= decade) && (data[2] < (decade + 10))))
 		    .forEach(data => addPerson(data[0], data[1], data[2]));
     }
-    addBlankLinesSlow(25);
+*/
+    // process names
+    var currentDecade = 0;
+    for (i=0; i<numberOfNames; i++) {
+	//console.log(i);
+        name = nameDataLines[i][0];
+	birthYear = nameDataLines[i][1];
+        deathYear = nameDataLines[i][2];
+        decade =  Math.floor(deathYear/10) * 10;
+	if (deathYear >= currentDecade + 10) {
+            addDecadeHeader(decade);
+	    currentDecade = decade;
+	}
+	addPerson(name, birthYear, deathYear);
+        await new Promise(r => setTimeout(r, pauseMilliseconds));
+    }
+
+    for (i=0; i<screenLengthRows; i++) {
+        addBlankLine();
+        await new Promise(r => setTimeout(r, pauseMilliseconds));
+    }
 }
 
-function addBlankLinesFast(numberOfLines) {
+function addBlankLines(numberOfLines) {
     for (line=0; line<numberOfLines; line++) {
 	addBlankLine();
     }
-    return currentRowId;
-}
-
-function addBlankLinesSlow(numberOfLines) {
-    for (line=0; line<numberOfLines; line++) {
-	addBlankLineSlow();
-    }
-    return currentRowId;
-}
-
-function addBlankLineSlow() {
-    addBlankLine();
-    //await new Promise(r => setTimeout(r, pauseMilliseconds)); 
-    sleep(pauseMilliseconds);
-    console.log(pauseMilliseconds);
     return currentRowId;
 }
 
@@ -166,19 +173,22 @@ function addBlankLine() {
 }
 
 function deleteTopRow() {
-    //document.getElementById("tableId").deleteRow(0);
+    document.getElementById("tableId").deleteRow(0);
     return;
 }
 
 function addDecadeHeader(decade) {
-    addBlankLinesSlow(1);
-    addBlankLinesSlow(1);
+    addBlankLine();
+    addBlankLine();
+    addBlankLine();
 
     currentColumnArray[0].innerHTML = formatEmptyCell();
     currentColumnArray[1].innerHTML = formatDecadeHeaderCell(decade);
     currentColumnArray[2].innerHTML = formatEmptyCell();
 	
-    addBlankLinesSlow(1);
+    addBlankLine();
+    addBlankLine();
+	
     return currentRowId;
 
 }
