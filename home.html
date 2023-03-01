@@ -118,10 +118,12 @@ window.onload = async function start() {
         addBlankLine();
         await new Promise(r => setTimeout(r, pauseMilliseconds));
     }
+    for (i=0; i<10; i++) addBlankLine();
+
     const endTime = new Date();
     const elapsedTimeMilliseconds = endTime - startTime;
     console.log("Ending at " + endTime.toLocaleString() + ".");
-    console.log("Elapsed time " + elapsedTimeMilliseconds + ".");
+    console.log("Elapsed time " + elapsedTimeMilliseconds/1000 + ".");
 	
 }
 
