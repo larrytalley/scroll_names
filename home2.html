@@ -1,3 +1,253 @@
-// Alternative version of scroll names includes country/state of birth and death,
-// and is sorted first by USA/Not USA, then by country/state, then by name, and
-// finally in the unlikely event of two persons with the same name, by birth year
+<!DOCTYPE HTML>
+<html scroll-behavior: smooth>
+<head>
+<title>Roll</title>
+<style>
+body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:10vw;background-color:black;} 
+h1, h2, h3{margin:0;padding:0;font-weight:normal;}
+h1{font-size:12vw;font-weight:bold;}
+h2{font-size:10vw;font-weight:bold;}
+h3{font-size:1.9vw;text-align:center;colspan=1;rowspan=1;color:white;}
+table {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+    width: 100%;
+}
+table thead {
+    /* head takes the height it requires, 
+    and it's not scaled when table is resized */
+    flex: 0 0 auto;
+    width: calc(100% - 0.9em);
+}
+table tbody {
+    /* body takes all the remaining available space */
+   // flex: 1 1 auto;
+    display: block;
+   // overflow-y: scroll;
+}
+table tbody tr {
+    width: 100%;
+    display:block;
+    height:2.1vw;
+    min-height:2.1vw;
+    max-height:2.1vw;
+    overflow:hidden;
+}
+table thead, table tbody tr {
+    display: table;
+    table-layout: fixed;
+}
+.day{background:#A8F9FC;color:#022587;}
+.night{background:#022587;color:#A8F9FC;}
+</style>
+</head>
+<body>
+    <div id="tableDiv">
+	    <table id="tableId" style="width: 100%;">
+		    <tr>
+		    </tr>
+	    </table>
+    </div>
+</body>
+<script type="text/javascript">
+formatCell = function(name, birthLocation, birthYear, deathLocation, deathYear)
+{
+    var returnString = "<h3>" + name + "<br/> (" + birthYear + " - " + deathYear + ")</h3>";
+    return returnString;
+}
+
+formatEmptyCell = function()
+{
+	var returnString = "<h3><br/></h3>";
+    return returnString;
+}
+
+formatLocationHeaderCell = function(location)
+{
+    var returnString = "<h3>" + location + "</h3>";
+    return returnString;
+}
+
+// global variables to track rows and columns
+var currentRowNumber = 0;
+var currentRowId;
+var currentColumnArray = new Array;
+var currentColumnNumber = 0;
+var currentColumnId;
+var screenWidthColumns = 1;
+var screenLengthRows = 20;
+var pauseMilliseconds;
+
+window.onload = async function start() {
+    
+    const nameDataLines = await readInputData();
+    const numberOfNames = nameDataLines.length;
+    const startTime = new Date();
+    console.log("Starting at " + startTime.toLocaleString() + ".");
+    console.log(numberOfNames);
+
+    var nameDatesArray = new Array;
+    var currentNameIndex = 0;
+    
+    for (i=0; i<numberOfNames; i++) {
+	if (nameDataLines[i][0].length > 0) {
+	    nameDatesArray.push(new Array("name",
+		    0, // birthYear
+		    0, // deathYear
+		    "birthCity",
+		    "birthStateCode",
+		    "birthStateName",
+		    "birthUSA",
+		    "deathCity",
+		    "deathStateCode",
+		    "deathStateName",
+		    "deathUSA"))
+	    nameDatesArray[currentNameIndex][0] = nameDataLines[i][0].replace(/[^ -~]+/g, ""); // name
+            nameDatesArray[currentNameIndex][1] = parseInt(nameDataLines[i][1]);               // birthYear
+            nameDatesArray[currentNameIndex][2] = parseInt(nameDataLines[i][2]);               // deathYear
+	    nameDatesArray[currentNameIndex][3] = nameDataLines[i][3].replace(/[^ -~]+/g, ""); // birthCity
+	    nameDatesArray[currentNameIndex][4] = nameDataLines[i][4].replace(/[^ -~]+/g, ""); // birthStateCode
+	    nameDatesArray[currentNameIndex][5] = nameDataLines[i][5].replace(/[^ -~]+/g, ""); // birthStateName
+	    nameDatesArray[currentNameIndex][6] = nameDataLines[i][6].replace(/[^ -~]+/g, ""); // birthUSA/not USA
+	    nameDatesArray[currentNameIndex][7] = nameDataLines[i][7].replace(/[^ -~]+/g, ""); // deathCity
+	    nameDatesArray[currentNameIndex][8] = nameDataLines[i][8].replace(/[^ -~]+/g, ""); // deathStateCode
+	    nameDatesArray[currentNameIndex][9] = nameDataLines[i][9].replace(/[^ -~]+/g, ""); // deathState
+	    nameDatesArray[currentNameIndex][10] = nameDataLines[i][10].replace(/[^ -~]+/g, ""); // deathUSA/not USA
+            console.log(currentNameIndex, nameDatesArray[currentNameIndex]);
+	    currentNameIndex++;
+	}
+    }
+
+    nameDatesArray.sort((a,b) =>
+	    a[2] === b[2] ?
+	    a[0].localeCompare(b[0]) :
+            a[2] - b[2]);
+
+    addBlankLines(screenLengthRows);
+
+    // process names
+    var currentDecade = 0;
+    var currentYear = 0;
+	
+    for (i=0; i<currentNameIndex; i++) {
+	//console.log(i, nameDatesArray[i]);
+	if (nameDatesArray[i][0].length > 0) {
+            name = nameDatesArray[i][0];
+	    birthYear = nameDatesArray[i][1];
+            deathYear = nameDatesArray[i][2];
+            decade =  Math.floor(deathYear/10) * 10;
+	    if (deathYear < decadeToYearThreshold && deathYear >= currentDecade + 10) {
+                addDecadeHeader(decade);
+	        currentDecade = decade;
+	    }
+		else if (deathYear >= decadeToYearThreshold && deathYear >= currentYear + 1) {
+                addDecadeHeader(deathYear);
+	        currentYear = deathYear;
+	    }
+	    addPerson(name, birthYear, deathYear);
+	   // console.log(i, name, birthYear, deathYear);
+        }
+    }
+
+    for (i=0; i<screenLengthRows + 5; i++) {
+        addBlankLine();
+    }
+
+    tableRows = document.getElementById("tableId").rows.length;
+    console.log("tableRows = " + tableRows);
+
+    offsetHeight = document.getElementById("tableId").offsetHeight;
+    console.log("offsetHeight = " + offsetHeight);
+    pauseMilliseconds = 225000 / offsetHeight;
+
+    window.scrollTo(0,0);
+    for (i=0; i<offsetHeight; i++) {
+	window.scrollBy(0,1);
+        await new Promise(r => setTimeout(r, pauseMilliseconds));
+    }
+
+    const endTime = new Date();
+    const elapsedTimeMilliseconds = endTime - startTime;
+    console.log("Ending at " + endTime.toLocaleString() + ".");
+    console.log("Elapsed time " + elapsedTimeMilliseconds/1000 + ".");
+	
+}
+
+function addBlankLines(numberOfLines) {
+    for (line=0; line<numberOfLines; line++) {
+	addBlankLine();
+    }
+    return currentRowId;
+}
+
+function addBlankLine() {
+    currentRowId = document.getElementById("tableId").insertRow();
+    currentRowNumber++;
+    for (c=0; c<screenWidthColumns; c++) {
+        currentColumnArray[c] = currentRowId.insertCell();
+        currentColumnArray[c].innerHTML = formatEmptyCell();
+    }
+
+    currentColumnNumber = 0;
+
+    if (currentRowNumber > screenLengthRows) deleteTopRow();
+    
+    return currentRowId;
+}
+
+function addBlankLineSingleColumn() {
+    currentRowId = document.getElementById("tableId").insertRow();
+    currentRowNumber++;
+    currentColumnArray[0] = currentRowId.insertCell();
+    currentColumnArray[0].innerHTML = formatEmptyCell();
+
+    currentColumnNumber = screenWidthColumns;
+
+    if (currentRowNumber > screenLengthRows) deleteTopRow();
+    
+    return currentRowId;
+}
+
+function deleteTopRow() {
+   // document.getElementById("tableId").deleteRow(0);
+    return;
+}
+
+function addDecadeHeader(decade) {
+    addBlankLineSingleColumn();
+    addBlankLineSingleColumn();
+    addBlankLineSingleColumn();
+	
+    currentColumnArray[0].innerHTML = formatDecadeHeaderCell(decade);
+
+    addBlankLineSingleColumn();
+    addBlankLineSingleColumn();
+	
+    return currentRowId;
+
+}
+
+function addPerson(name, birthYear, deathYear) {
+    if (currentColumnNumber >= screenWidthColumns) {
+        addBlankLine();
+    }
+   // console.log(currentColumnNumber);
+    currentColumnArray[currentColumnNumber].innerHTML = formatCell(name, birthYear, deathYear);
+    currentColumnNumber++;
+    return currentRowId;
+}
+
+async function readInputData() {
+    const response = await 
+    fetch('https://docs.google.com/document/d/10PkqSZ3iPuy6vIPcjINc5u72oD9iKc_YG8mwaTPxhUA/export?format=txt');
+    const nameData = await response.text();
+    const nameDataLines = nameData.split(/\r?\n/);
+
+    return nameDataLines.map((line) => 
+		line.split(/,/));
+}
+
+</script>
+</body>
+</html>
