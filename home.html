@@ -75,7 +75,8 @@ var currentRowId;
 var currentColumnArray = new Array;
 var currentColumnNumber = 0;
 var currentColumnId;
-var screenWidthColumns = 3;
+var screenWidthColumns = 2;
+var decadeToYearThreshold = 2020;
 var screenLengthRows = 20;
 var pauseMilliseconds;
 
@@ -86,43 +87,73 @@ window.onload = async function start() {
     const startTime = new Date();
     console.log("Starting at " + startTime.toLocaleString() + ".");
     console.log(numberOfNames);
-    nameDataLines.sort((a,b) =>
-        a[2] === b[2] ?
+    //console.log(nameDataLines[0]);
+
+    var nameDatesArray = new Array;
+    var currentNameIndex = 0;
+    
+    for (i=0; i<numberOfNames; i++) {
+	if (nameDataLines[i][0].length > 0) {
+	    nameDatesArray.push(new Array("",0,0))
+	    nameDatesArray[currentNameIndex][0] = nameDataLines[i][0].replace(/[^ -~]+/g, "");
+            nameDatesArray[currentNameIndex][1] = parseInt(nameDataLines[i][1]);
+	    nameDatesArray[currentNameIndex][2] = parseInt(nameDataLines[i][2]);
+            console.log(currentNameIndex, nameDatesArray[currentNameIndex]);
+	    currentNameIndex++;
+	}
+    }
+
+    nameDatesArray.sort((a,b) =>
+	    a[2] === b[2] ?
 	    a[0].localeCompare(b[0]) :
             a[2] - b[2]);
+    console.log(nameDatesArray[0]);
+    console.log(nameDatesArray[1]);
+    console.log(nameDatesArray[2]);
+    console.log(nameDatesArray[3]);
+    console.log(nameDatesArray[4]);
+    console.log(nameDatesArray[5]);
+    console.log(nameDatesArray[6]);
+    console.log(nameDatesArray[7]);
+	
 
     addBlankLines(screenLengthRows);
 
     // process names
     var currentDecade = 0;
-    for (i=0; i<numberOfNames; i++) {
+    var currentYear = 0;
+	
+    for (i=0; i<currentNameIndex; i++) {
 	//console.log(i);
-        name = nameDataLines[i][0];
-	birthYear = nameDataLines[i][1];
-        deathYear = nameDataLines[i][2];
-        decade =  Math.floor(deathYear/10) * 10;
-	if (deathYear >= currentDecade + 10) {
-            addDecadeHeader(decade);
-	    currentDecade = decade;
-	}
-	addPerson(name, birthYear, deathYear);
+	//console.log(nameDataLines[i][0]);
+	//console.log(nameDataLines[i][0].length);
+	if (nameDatesArray[i][0].length > 0) {
+            name = nameDatesArray[i][0];
+	    birthYear = nameDatesArray[i][1];
+            deathYear = nameDatesArray[i][2];
+            decade =  Math.floor(deathYear/10) * 10;
+	    if (deathYear < decadeToYearThreshold && deathYear >= currentDecade + 10) {
+                addDecadeHeader(decade);
+	        currentDecade = decade;
+	    }
+		else if (deathYear >= decadeToYearThreshold && deathYear >= currentYear + 1) {
+                addDecadeHeader(deathYear);
+	        currentYear = deathYear;
+	    }
+	    addPerson(name, birthYear, deathYear);
+	   // console.log(i, name, birthYear, deathYear);
+        }
     }
 
-    for (i=0; i<screenLengthRows * 2; i++) {
+    for (i=0; i<screenLengthRows + 5; i++) {
         addBlankLine();
     }
+
     tableRows = document.getElementById("tableId").rows.length;
     console.log("tableRows = " + tableRows);
 
-   // rowPixels = document.querySelector('tr').getBoundingClientRect(); 
-   // console.log("rowsPixels = " + rowPixels);
     offsetHeight = document.getElementById("tableId").offsetHeight;
-
     console.log("offsetHeight = " + offsetHeight);
-
-   // totalPixels = tableRows * rowPixels;
-   // console.log("totalPixels = " + totalPixels);
-
     pauseMilliseconds = 225000 / offsetHeight;
 
     window.scrollTo(0,0);
@@ -160,20 +191,33 @@ function addBlankLine() {
     return currentRowId;
 }
 
+function addBlankLineSingleColumn() {
+    currentRowId = document.getElementById("tableId").insertRow();
+    currentRowNumber++;
+    currentColumnArray[0] = currentRowId.insertCell();
+    currentColumnArray[0].innerHTML = formatEmptyCell();
+
+    currentColumnNumber = screenWidthColumns;
+
+    if (currentRowNumber > screenLengthRows) deleteTopRow();
+    
+    return currentRowId;
+}
+
 function deleteTopRow() {
    // document.getElementById("tableId").deleteRow(0);
     return;
 }
 
 function addDecadeHeader(decade) {
-    addBlankLine();
-    addBlankLine();
-    addBlankLine();
+    addBlankLineSingleColumn();
+    addBlankLineSingleColumn();
+    addBlankLineSingleColumn();
 	
-    currentColumnArray[Math.trunc(screenWidthColumns / 2)].innerHTML = formatDecadeHeaderCell(decade);
+    currentColumnArray[0].innerHTML = formatDecadeHeaderCell(decade);
 
-    addBlankLine();
-    addBlankLine();
+    addBlankLineSingleColumn();
+    addBlankLineSingleColumn();
 	
     return currentRowId;
 
