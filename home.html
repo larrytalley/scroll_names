@@ -87,7 +87,6 @@ window.onload = async function start() {
     const startTime = new Date();
     console.log("Starting at " + startTime.toLocaleString() + ".");
     console.log(numberOfNames);
-    //console.log(nameDataLines[0]);
 
     var nameDatesArray = new Array;
     var currentNameIndex = 0;
@@ -98,7 +97,7 @@ window.onload = async function start() {
 	    nameDatesArray[currentNameIndex][0] = nameDataLines[i][0].replace(/[^ -~]+/g, "");
             nameDatesArray[currentNameIndex][1] = parseInt(nameDataLines[i][1]);
 	    nameDatesArray[currentNameIndex][2] = parseInt(nameDataLines[i][2]);
-            console.log(currentNameIndex, nameDatesArray[currentNameIndex]);
+            //console.log(currentNameIndex, nameDatesArray[currentNameIndex]);
 	    currentNameIndex++;
 	}
     }
@@ -107,15 +106,6 @@ window.onload = async function start() {
 	    a[2] === b[2] ?
 	    a[0].localeCompare(b[0]) :
             a[2] - b[2]);
-    console.log(nameDatesArray[0]);
-    console.log(nameDatesArray[1]);
-    console.log(nameDatesArray[2]);
-    console.log(nameDatesArray[3]);
-    console.log(nameDatesArray[4]);
-    console.log(nameDatesArray[5]);
-    console.log(nameDatesArray[6]);
-    console.log(nameDatesArray[7]);
-	
 
     addBlankLines(screenLengthRows);
 
@@ -124,9 +114,7 @@ window.onload = async function start() {
     var currentYear = 0;
 	
     for (i=0; i<currentNameIndex; i++) {
-	//console.log(i);
-	//console.log(nameDataLines[i][0]);
-	//console.log(nameDataLines[i][0].length);
+	//console.log(i, nameDatesArray[i]);
 	if (nameDatesArray[i][0].length > 0) {
             name = nameDatesArray[i][0];
 	    birthYear = nameDatesArray[i][1];
