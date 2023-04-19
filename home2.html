@@ -63,7 +63,7 @@ formatEmptyCell = function()
     return returnString;
 }
 
-formatLocationHeaderCell = function(location)
+formatHeaderCell = function(location)
 {
     var returnString = "<h3>" + location + "</h3>";
     return returnString;
@@ -127,8 +127,7 @@ window.onload = async function start() {
     addBlankLines(screenLengthRows);
 
     // process names
-    var currentDecade = 0;
-    var currentYear = 0;
+    var currentBirthState = "";
 	
     for (i=0; i<currentNameIndex; i++) {
 	//console.log(i, nameDatesArray[i]);
@@ -136,16 +135,15 @@ window.onload = async function start() {
             name = nameDatesArray[i][0];
 	    birthYear = nameDatesArray[i][1];
             deathYear = nameDatesArray[i][2];
-            decade =  Math.floor(deathYear/10) * 10;
-	    if (deathYear < decadeToYearThreshold && deathYear >= currentDecade + 10) {
-                addDecadeHeader(decade);
-	        currentDecade = decade;
+	    birthCity = nameDatesArray[i][3];
+	    birthState = nameDatesArray[i][5];
+	    deathCity = nameDatesArray[i][7];
+	    deathState = nameDatesArray[i][9];
+		if (currentBirthState != birthState) {
+                addHeader(birthState);
+	        currentBirthState = birthState;
 	    }
-		else if (deathYear >= decadeToYearThreshold && deathYear >= currentYear + 1) {
-                addDecadeHeader(deathYear);
-	        currentYear = deathYear;
-	    }
-	    addPerson(name, birthYear, deathYear);
+	    addPerson(name, birthCity, birthYear, deathCity, deathYear);
 	   // console.log(i, name, birthYear, deathYear);
         }
     }
@@ -214,12 +212,12 @@ function deleteTopRow() {
     return;
 }
 
-function addDecadeHeader(decade) {
+function addHeader(location) {
     addBlankLineSingleColumn();
     addBlankLineSingleColumn();
     addBlankLineSingleColumn();
 	
-    currentColumnArray[0].innerHTML = formatDecadeHeaderCell(decade);
+    currentColumnArray[0].innerHTML = formatHeaderCell(location);
 
     addBlankLineSingleColumn();
     addBlankLineSingleColumn();
@@ -228,12 +226,12 @@ function addDecadeHeader(decade) {
 
 }
 
-function addPerson(name, birthYear, deathYear) {
+function addPerson(name, birthCity, birthYear, deathCity, deathYear) {
     if (currentColumnNumber >= screenWidthColumns) {
         addBlankLine();
     }
    // console.log(currentColumnNumber);
-    currentColumnArray[currentColumnNumber].innerHTML = formatCell(name, birthYear, deathYear);
+    currentColumnArray[currentColumnNumber].innerHTML = formatCell(name, birthCity, birthYear, deathCity, deathYear);
     currentColumnNumber++;
     return currentRowId;
 }
