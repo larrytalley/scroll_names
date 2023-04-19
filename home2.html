@@ -121,6 +121,7 @@ window.onload = async function start() {
 	    currentNameIndex++;
 	}
     }
+  
 
     nameDatesArray.sort((a,b) =>
 	    a[6] === b[6] ?
@@ -131,6 +132,8 @@ window.onload = async function start() {
 
     // process names
     var currentBirthState = "";
+
+    while (1) {
 	
     for (i=0; i<currentNameIndex; i++) {
 	//console.log(i, nameDatesArray[i]);
@@ -149,6 +152,8 @@ window.onload = async function start() {
 	    addPerson(name, birthCity, birthYear, deathCity, deathYear);
 	   // console.log(i, name, birthYear, deathYear);
         }
+    }
+
     }
 
     for (i=0; i<screenLengthRows + 5; i++) {
