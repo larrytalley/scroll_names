@@ -53,7 +53,10 @@ table thead, table tbody tr {
 <script type="text/javascript">
 formatCell = function(name, birthLocation, birthYear, deathLocation, deathYear)
 {
-    var returnString = "<h3>" + name + "<br/> (" + birthYear + " - " + deathYear + ")</h3>";
+    var returnString = "<h3>" + name + "<br/>" +
+		birthLocation + " (" + birthYear + ") - " +
+		deathLocation + " (" + deathYear + ")" +
+		"</h3>";
     return returnString;
 }
 
