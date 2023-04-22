@@ -7,7 +7,7 @@ body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:10vw;ba
 h1, h2, h3{margin:0;padding:0;font-weight:normal;}
 h1{font-size:12vw;font-weight:bold;}
 h2{font-size:10vw;font-weight:bold;}
-h3{font-size:1.9vw;text-align:center;colspan=1;rowspan=1;color:white;}
+h3{font-size:4vw;text-align:center;colspan=1;rowspan=1;color:white;}
 table {
     display: flex;
     flex-flow: column;
@@ -75,9 +75,10 @@ var currentRowId;
 var currentColumnArray = new Array;
 var currentColumnNumber = 0;
 var currentColumnId;
-var screenWidthColumns = 2;
+var screenWidthColumns = 1;
 var decadeToYearThreshold = 2020;
-var screenLengthRows = 20;
+decadeToYearThreshold = 1900;
+var screenLengthRows = 22;
 var pauseMilliseconds;
 
 window.onload = async function start() {
@@ -95,17 +96,19 @@ window.onload = async function start() {
 	if (nameDataLines[i][0].length > 0) {
 	    nameDatesArray.push(new Array("",0,0))
 	    nameDatesArray[currentNameIndex][0] = nameDataLines[i][0].replace(/[^ -~]+/g, "");
-            nameDatesArray[currentNameIndex][1] = parseInt(nameDataLines[i][1]);
-	    nameDatesArray[currentNameIndex][2] = parseInt(nameDataLines[i][2]);
-            //console.log(currentNameIndex, nameDatesArray[currentNameIndex]);
+            nameDatesArray[currentNameIndex][1] = nameDataLines[i][1];
+	    nameDatesArray[currentNameIndex][2] = nameDataLines[i][2];
+            console.log(currentNameIndex, nameDatesArray[currentNameIndex]);
 	    currentNameIndex++;
 	}
     }
+            console.log(112, nameDatesArray[112]);
+
 
     nameDatesArray.sort((a,b) =>
 	    a[2] === b[2] ?
 	    a[0].localeCompare(b[0]) :
-            a[2] - b[2]);
+            a[2].localeCompare(b[2]));
 
     addBlankLines(screenLengthRows);
 
@@ -129,7 +132,7 @@ window.onload = async function start() {
 	        currentYear = deathYear;
 	    }
 	    addPerson(name, birthYear, deathYear);
-	   // console.log(i, name, birthYear, deathYear);
+	    console.log(i, name, birthYear, deathYear);
         }
     }
 
@@ -143,6 +146,8 @@ window.onload = async function start() {
     offsetHeight = document.getElementById("tableId").offsetHeight;
     console.log("offsetHeight = " + offsetHeight);
     pauseMilliseconds = 225000 / offsetHeight;
+    pauseMilliseconds = pauseMilliseconds * .9;
+
 
     window.scrollTo(0,0);
     for (i=0; i<offsetHeight; i++) {
