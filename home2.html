@@ -84,11 +84,13 @@ var pauseMilliseconds;
 
 window.onload = async function start() {
     
-    const nameDataLines = await readInputData();
-    const numberOfNames = nameDataLines.length;
     const startTime = new Date();
     console.log("Starting at " + startTime.toLocaleString() + ".");
-    console.log(numberOfNames);
+	
+    const nameDataLines = await readInputData();
+    const numberOfNames = nameDataLines.length;
+
+    console.log("Number of names = ", numberOfNames);
 
     var nameDatesArray = new Array;
     var currentNameIndex = 0;
@@ -117,23 +119,27 @@ window.onload = async function start() {
 	    nameDatesArray[currentNameIndex][8] = nameDataLines[i][8].replace(/[^ -~]+/g, ""); // deathStateCode
 	    nameDatesArray[currentNameIndex][9] = nameDataLines[i][9].replace(/[^ -~]+/g, ""); // deathState
 	    nameDatesArray[currentNameIndex][10] = nameDataLines[i][10].replace(/[^ -~]+/g, ""); // deathUSA/not USA
-            console.log(currentNameIndex, nameDatesArray[currentNameIndex]);
+            //console.log(currentNameIndex, nameDatesArray[currentNameIndex]);
 	    currentNameIndex++;
 	}
     }
   
+    // define sort function
+    const fSort = (a,b) => 
+	{
+	let Dx = a[6].localeCompare(b[6]);                 // first sort by birthUSA/not USA
+	if (Dx === 0) Dx = a[5].localeCompare(b[5]);      // then by birthStateName
+	if (Dx === 0) Dx = a[0].localeCompare(b[0]);       // then by name
+	return Dx;
+	}
 
-    nameDatesArray.sort((a,b) =>
-	    a[6] === b[6] ?
-	    a[5].localeCompare(b[5]) :
-            a[0].localeCompare(b[0]));
+    nameDatesArray.sort(fSort);
 
     addBlankLines(screenLengthRows);
 
     // process names
     var currentBirthState = "";
 
-    while (1) {
 	
     for (i=0; i<currentNameIndex; i++) {
 	//console.log(i, nameDatesArray[i]);
@@ -150,11 +156,10 @@ window.onload = async function start() {
 	        currentBirthState = birthState;
 	    }
 	    addPerson(name, birthCity, birthYear, deathCity, deathYear);
-	    console.log(i, name, birthYear, deathYear);
+	    console.log(i, nameDatesArray[i]);
         }
     }
 
-    }
 
     for (i=0; i<screenLengthRows + 5; i++) {
         addBlankLine();
@@ -167,12 +172,14 @@ window.onload = async function start() {
     console.log("offsetHeight = " + offsetHeight);
     pauseMilliseconds = 225000 / offsetHeight;
 
+    while (1) {
     window.scrollTo(0,0);
     for (i=0; i<offsetHeight; i++) {
 	window.scrollBy(0,1);
         await new Promise(r => setTimeout(r, pauseMilliseconds));
     }
-
+    }
+	
     const endTime = new Date();
     const elapsedTimeMilliseconds = endTime - startTime;
     console.log("Ending at " + endTime.toLocaleString() + ".");
@@ -238,7 +245,7 @@ function addPerson(name, birthCity, birthYear, deathCity, deathYear) {
     if (currentColumnNumber >= screenWidthColumns) {
         addBlankLine();
     }
-   // console.log(currentColumnNumber);
+    //console.log(currentColumnNumber);
     currentColumnArray[currentColumnNumber].innerHTML = formatCell(name, birthCity, birthYear, deathCity, deathYear);
     currentColumnNumber++;
     return currentRowId;
@@ -249,9 +256,11 @@ async function readInputData() {
     fetch('https://docs.google.com/document/d/10PkqSZ3iPuy6vIPcjINc5u72oD9iKc_YG8mwaTPxhUA/export?format=txt');
     const nameData = await response.text();
     const nameDataLines = nameData.split(/\r?\n/);
-
-    return nameDataLines.map((line) => 
-		line.split(/,/));
+    console.log("Lines read = ", nameDataLines.length);
+    return nameDataLines
+		.filter(line => line.length > 0)
+		.map((line) => 
+	            line.split(/,/));
 }
 
 </script>
