@@ -110,6 +110,18 @@ window.onload = async function start() {
 	    a[0].localeCompare(b[0]) :
             a[2].localeCompare(b[2]));
 
+    // remove duplicate rows which should be adjacent after the sort
+    for (i=1; i<nameDatesArray.length; i++) {
+	//console.log(i);
+	if (nameDatesArray[i].length < 3 || nameDatesArray[i][0].length < 1 || nameDatesArray[i][0].localeCompare(nameDatesArray[i-1][0]) == 0)
+	{
+	console.log("Removing duplicate or incomplete ", nameDatesArray[i]);
+	nameDatesArray.splice(i,1);
+	}
+    }
+    currentNameIndex = nameDatesArray.length;
+
+
     addBlankLines(screenLengthRows);
 
     // process names
