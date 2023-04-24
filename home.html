@@ -98,12 +98,10 @@ window.onload = async function start() {
 	    nameDatesArray[currentNameIndex][0] = nameDataLines[i][0].replace(/[^ -~]+/g, "");
             nameDatesArray[currentNameIndex][1] = nameDataLines[i][1];
 	    nameDatesArray[currentNameIndex][2] = nameDataLines[i][2];
-            console.log(currentNameIndex, nameDatesArray[currentNameIndex]);
+            //console.log(currentNameIndex, nameDatesArray[currentNameIndex]);
 	    currentNameIndex++;
 	}
     }
-            console.log(112, nameDatesArray[112]);
-
 
     nameDatesArray.sort((a,b) =>
 	    a[2] === b[2] ?
@@ -244,8 +242,10 @@ async function readInputData() {
     const nameData = await response.text();
     const nameDataLines = nameData.split(/\r?\n/);
 
-    return nameDataLines.map((line) => 
-		line.split(/,/));
+    return nameDataLines
+		.filter(line => line.length > 0)
+		.map((line) => 
+	            line.split(/,/));
 }
 
 </script>
