@@ -140,6 +140,16 @@ window.onload = async function start() {
     // process names
     var currentBirthState = "";
 
+    // remove duplicate rows which should be adjacent after the sort
+    for (i=1; i<nameDatesArray.length; i++) {
+	//console.log(i);
+	if (nameDatesArray[i].length < 10 || nameDatesArray[i][0].length < 1 || nameDatesArray[i][0].localeCompare(nameDatesArray[i-1][0]) == 0)
+	{
+	console.log("Removing duplicate or incomplete ", nameDatesArray[i]);
+	nameDatesArray.splice(i,1);
+	}
+    }
+    currentNameIndex = nameDatesArray.length;
 	
     for (i=0; i<currentNameIndex; i++) {
 	//console.log(i, nameDatesArray[i]);
