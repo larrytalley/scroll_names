@@ -4,10 +4,11 @@
 <title>Roll</title>
 <style>
 body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:10vw;background-color:black;} 
-h1, h2, h3{margin:0;padding:0;font-weight:normal;}
+h1, h2, h3, h4 {margin:0;padding:0;font-weight:normal;}
 h1{font-size:12vw;font-weight:bold;text-align:center;colspan=1;rowspan=1;color:white;}
 h2{font-size:7vw;font-weight:bold;text-align:center;colspan=1;rowspan=1;color:white;}
 h3{font-size:4vw;text-align:center;colspan=1;rowspan=1;color:white;}
+h4{font-size:2vw;text-align:center;colspan=1;rowspan=1;color:white;}
 table {
     display: flex;
     flex-flow: column;
@@ -51,23 +52,40 @@ table thead, table tbody tr {
     </div>
 </body>
 <script type="text/javascript">
-formatCell = function(name, birthLocation, birthYear, deathLocation, deathYear)
+formatCell = function(name, birthCity, birthStateCode, birthStateName, birthYear, deathCity, deathStateCode, deathStateName, deathYear )
 {
-    var returnString = "<h3>" + name + "<br/>" +
-		birthLocation + " (" + birthYear + ") - " +
-		deathLocation + " (" + deathYear + ")" +
-		"<br/><br/></h3>";
+    var returnString = "<h3>" + name + "<br/>"
+	
+	if ( (birthCity != "?") && (birthCity != "") ) { 
+		returnString = returnString + "<h4>" + birthCity + ", " + birthStateCode
+	} else returnString = returnString + "<h4>" + birthStateName;
+	
+	if( (birthYear != "?") && (birthYear != "") && (birthYear != "NaN") ) {
+		returnString = returnString + " (" + birthYear + ")" + "  -  "
+	} else returnString = returnString + " - ";
+	
+	if ( (deathCity != "?") && (deathCity != "") ) { 
+		returnString = returnString + deathCity + ", " + deathStateCode
+	} else returnString = returnString + deathStateName;
+	
+	if( (deathYear != "?") && (deathYear != "") && (deathYear != "NaN") ) {
+		returnString = returnString + " (" + deathYear + ")"
+	}
+	
+	returnString = returnString + "</h4>" + "<br/>" + "</h3>";
+
     return returnString;
 }
 
 formatEmptyCell = function()
 {
-	var returnString = "<h3><br/></h3>";
+    var returnString = "<h3><br/></h3>";
     return returnString;
 }
 
 formatHeaderCell = function(location)
 {
+    // var returnString = "<h4>" + "born in" + "</h4>" + "<br/>" + "<h2>" + location + "</h2>";
     var returnString = "<h2>" + location + "</h2>";
     return returnString;
 }
@@ -113,7 +131,7 @@ window.onload = async function start() {
             nameDatesArray[currentNameIndex][2] = parseInt(nameDataLines[i][2]);               // deathYear
 	    nameDatesArray[currentNameIndex][3] = nameDataLines[i][3].replace(/[^ -~]+/g, ""); // birthCity
 	    nameDatesArray[currentNameIndex][4] = nameDataLines[i][4].replace(/[^ -~]+/g, ""); // birthStateCode
-	    nameDatesArray[currentNameIndex][5] = nameDataLines[i][5].replace(/[^ -~]+/g, ""); // birthStateName
+	    nameDatesArray[currentNameIndex][5] = nameDataLines[i][5].replace(/[^ -~]+/g, ""); // birthState
 	    nameDatesArray[currentNameIndex][6] = nameDataLines[i][6].replace(/[^ -~]+/g, ""); // birthUSA/not USA
 	    nameDatesArray[currentNameIndex][7] = nameDataLines[i][7].replace(/[^ -~]+/g, ""); // deathCity
 	    nameDatesArray[currentNameIndex][8] = nameDataLines[i][8].replace(/[^ -~]+/g, ""); // deathStateCode
@@ -158,14 +176,16 @@ window.onload = async function start() {
 	    birthYear = nameDatesArray[i][1];
             deathYear = nameDatesArray[i][2];
 	    birthCity = nameDatesArray[i][3];
+	    birthStateCode = nameDatesArray[i][4];
 	    birthState = nameDatesArray[i][5];
 	    deathCity = nameDatesArray[i][7];
+	    deathStateCode = nameDatesArray[i][8];
 	    deathState = nameDatesArray[i][9];
 		if (currentBirthState != birthState) {
                 addHeader(birthState);
 	        currentBirthState = birthState;
 	    }
-	    addPerson(name, birthCity, birthYear, deathCity, deathYear);
+	    addPerson(name, birthCity, birthStateCode, birthState, birthYear, deathCity, deathStateCode, deathState, deathYear);
 	    //console.log(i, nameDatesArray[i]);
         }
     }
@@ -251,12 +271,13 @@ function addHeader(location) {
 
 }
 
-function addPerson(name, birthCity, birthYear, deathCity, deathYear) {
+function addPerson(name, birthCity, birthStateCode, birthState, birthYear, deathCity, deathStateCode, deathState, deathYear) {
     if (currentColumnNumber >= screenWidthColumns) {
         addBlankLine();
     }
     //console.log(currentColumnNumber);
-    currentColumnArray[currentColumnNumber].innerHTML = formatCell(name, birthCity, birthYear, deathCity, deathYear);
+    currentColumnArray[currentColumnNumber].innerHTML = 
+	formatCell(name, birthCity, birthStateCode, birthState, birthYear, deathCity, deathStateCode, deathState, deathYear );
     currentColumnNumber++;
     return currentRowId;
 }
