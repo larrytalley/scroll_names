@@ -287,6 +287,9 @@ async function readInputData() {
     fetch('https://docs.google.com/document/d/10PkqSZ3iPuy6vIPcjINc5u72oD9iKc_YG8mwaTPxhUA/export?format=txt');
     const nameData = await response.text();
     const nameDataLines = nameData.split(/\r?\n/);
+
+    nameDataLines.shift();     // skip the first line of the file, it should be headings
+	
     console.log("Lines read = ", nameDataLines.length);
     return nameDataLines
 		.filter(line => line.length > 0)

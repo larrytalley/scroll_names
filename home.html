@@ -146,7 +146,7 @@ window.onload = async function start() {
         }
     }
 
-    for (i=0; i<screenLengthRows + 8; i++) {
+    for (i=0; i<screenLengthRows + 6; i++) {
         addBlankLine();
     }
 
@@ -241,6 +241,8 @@ async function readInputData() {
     fetch('https://docs.google.com/document/d/10PkqSZ3iPuy6vIPcjINc5u72oD9iKc_YG8mwaTPxhUA/export?format=txt');
     const nameData = await response.text();
     const nameDataLines = nameData.split(/\r?\n/);
+
+    nameDataLines.shift();     // skip the first line of the file, it should be headings
 
     return nameDataLines
 		.filter(line => line.length > 0)
