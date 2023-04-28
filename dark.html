@@ -1,0 +1,165 @@
+<!DOCTYPE HTML>
+<html scroll-behavior: smooth>
+<head>
+<title>Roll</title>
+<style>
+body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:10vw;background-color:black;} 
+h1, h2, h3, h4 {margin:0;padding:0;font-weight:normal;}
+h1{font-size:12vw;font-weight:bold;text-align:center;colspan=1;rowspan=1;color:white;}
+h2{font-size:7vw;font-weight:bold;text-align:center;colspan=1;rowspan=1;color:white;}
+h3{font-size:4vw;text-align:center;colspan=1;rowspan=1;color:white;}
+h4{font-size:2vw;text-align:center;colspan=1;rowspan=1;color:white;}
+table {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+    width: 100%;
+}
+table thead {
+    /* head takes the height it requires, 
+    and it's not scaled when table is resized */
+    flex: 0 0 auto;
+    width: calc(100% - 0.9em);
+}
+table tbody {
+    /* body takes all the remaining available space */
+   // flex: 1 1 auto;
+    display: block;
+   // overflow-y: scroll;
+}
+table tbody tr {
+    width: 100%;
+    display:block;
+    height:2.1vw;
+    min-height:2.1vw;
+    max-height:2.1vw;
+    overflow:hidden;
+}
+table thead, table tbody tr {
+    display: table;
+    table-layout: fixed;
+}
+.day{background:#A8F9FC;color:#022587;}
+.night{background:#022587;color:#A8F9FC;}
+</style>
+</head>
+<body>
+    <div id="tableDiv">
+	    <table id="tableId" style="width: 100%;">
+		    <tr>
+		    </tr>
+	    </table>
+    </div>
+</body>
+<script type="text/javascript">
+formatCell = function(name, birthCity, birthStateCode, birthStateName, birthYear, deathCity, deathStateCode, deathStateName, deathYear )
+{
+    var returnString = "<h3>" + name + "<br/>"
+	
+	if ( (birthCity != "?") && (birthCity != "") ) { 
+		returnString = returnString + "<h4>" + birthCity + ", " + birthStateCode
+	} else returnString = returnString + "<h4>" + birthStateName;
+	
+	if( (birthYear != "?") && (birthYear != "") && (birthYear != "NaN") ) {
+		returnString = returnString + " (" + birthYear + ")" + "  -  "
+	} else returnString = returnString + " - ";
+	
+	if ( (deathCity != "?") && (deathCity != "") ) { 
+		returnString = returnString + deathCity + ", " + deathStateCode
+	} else returnString = returnString + deathStateName;
+	
+	if( (deathYear != "?") && (deathYear != "") && (deathYear != "NaN") ) {
+		returnString = returnString + " (" + deathYear + ")"
+	}
+	
+	returnString = returnString + "</h4>" + "<br/>" + "</h3>";
+
+    return returnString;
+}
+
+formatEmptyCell = function()
+{
+    var returnString = "<h3><br/></h3>";
+    return returnString;
+}
+
+formatHeaderCell = function(location)
+{
+    // var returnString = "<h4>" + "born in" + "</h4>" + "<br/>" + "<h2>" + location + "</h2>";
+    var returnString = "<h2>" + location + "</h2>";
+    return returnString;
+}
+
+// global variables to track rows and columns
+var currentRowNumber = 0;
+var currentRowId;
+var currentColumnArray = new Array;
+var currentColumnNumber = 0;
+var currentColumnId;
+var screenWidthColumns = 1;
+var screenLengthRows = 20;
+var pauseMilliseconds;
+
+window.onload = async function start() {
+    
+    const startTime = new Date();
+    console.log("Starting at " + startTime.toLocaleString() + ".");
+	
+
+    addBlankLines(screenLengthRows);
+
+
+    while (1) {
+    window.scrollTo(0,0);
+    for (i=0; i<offsetHeight; i++) {
+	window.scrollBy(0,1);
+        await new Promise(r => setTimeout(r, pauseMilliseconds));
+    }
+    }
+	
+    const endTime = new Date();
+    const elapsedTimeMilliseconds = endTime - startTime;
+    console.log("Ending at " + endTime.toLocaleString() + ".");
+    console.log("Elapsed time " + elapsedTimeMilliseconds/1000 + ".");
+	
+}
+
+function addBlankLines(numberOfLines) {
+    for (line=0; line<numberOfLines; line++) {
+	addBlankLine();
+    }
+    return currentRowId;
+}
+
+function addBlankLine() {
+    currentRowId = document.getElementById("tableId").insertRow();
+    currentRowNumber++;
+    for (c=0; c<screenWidthColumns; c++) {
+        currentColumnArray[c] = currentRowId.insertCell();
+        currentColumnArray[c].innerHTML = formatEmptyCell();
+    }
+
+    currentColumnNumber = 0;
+
+    if (currentRowNumber > screenLengthRows) deleteTopRow();
+    
+    return currentRowId;
+}
+
+function addBlankLineSingleColumn() {
+    currentRowId = document.getElementById("tableId").insertRow();
+    currentRowNumber++;
+    currentColumnArray[0] = currentRowId.insertCell();
+    currentColumnArray[0].innerHTML = formatEmptyCell();
+
+    currentColumnNumber = screenWidthColumns;
+
+    if (currentRowNumber > screenLengthRows) deleteTopRow();
+    
+    return currentRowId;
+}
+
+
+</script>
+</body>
+</html>
