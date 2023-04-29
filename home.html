@@ -51,6 +51,16 @@ table thead, table tbody tr {
     </div>
 </body>
 <script type="text/javascript">
+
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
+}
+
 formatCell = function(name, birthYear, deathYear)
 {
     var returnString = "<h3>" + name + " (" + birthYear + " - " + deathYear + ")</h3>";
@@ -156,13 +166,15 @@ window.onload = async function start() {
     offsetHeight = document.getElementById("tableId").offsetHeight;
     console.log("offsetHeight = " + offsetHeight);
     pauseMilliseconds = 225000 / offsetHeight;
-    pauseMilliseconds = pauseMilliseconds * .4;
+    pauseMilliseconds = pauseMilliseconds * .04;
+    pauseMilliseconds = 1;
 
 
     window.scrollTo(0,0);
     for (i=0; i<offsetHeight; i++) {
 	window.scrollBy(0,1);
         await new Promise(r => setTimeout(r, pauseMilliseconds));
+	//sleep(pauseMilliseconds);
     }
 
     const endTime = new Date();
